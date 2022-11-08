@@ -95,7 +95,7 @@ class RecoveryWindowManager {
         /**
          * A new {@link State#RUNNING Running} state should trigger a new recovery window countdown.
          */
-        public static final State RECOVER_TRIGGER = State.RUNNING;
+        public final State RECOVER_TRIGGER = State.RUNNING;
 
         @Override
         public void onChange(final State newState, final State oldState) {

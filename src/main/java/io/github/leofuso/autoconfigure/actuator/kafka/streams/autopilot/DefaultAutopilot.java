@@ -108,15 +108,15 @@ public class DefaultAutopilot implements Autopilot {
     /**
      * Helper to format huge numbers, commonly placed in situations of high partition-lag.
      */
-    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getCompactNumberInstance(
-            Locale.US,
-            NumberFormat.Style.SHORT
+    private static final NumberFormat NUMBER_FORMAT = NumberFormat.getNumberInstance(
+            Locale.US
     );
 
     /**
      * Constructs a new DefaultAutopilot instance, non-automated.
-     * @param streams to delegate the actions to, and holder of required thread info.
-     * @param config used to coordinate {@link Autopilot} automated actions.
+     *
+     * @param streams    to delegate the actions to, and holder of required thread info.
+     * @param config     used to coordinate {@link Autopilot} automated actions.
      * @param properties used to coordinate {@link Autopilot} automated actions.
      */
     public DefaultAutopilot(KafkaStreams streams, AutopilotConfiguration config, Properties properties) {
@@ -204,22 +204,22 @@ public class DefaultAutopilot implements Autopilot {
         }
 
         final State nextState = decideNextState();
-        return switch (nextState) {
-            case STAND_BY, BOOSTED -> {
+        switch (nextState) {
+            case STAND_BY:
+            case BOOSTED:
                 state = nextState;
-                yield CompletableFuture.completedFuture(state);
-            }
-            case BOOSTING -> {
+                return CompletableFuture.completedFuture(state);
+            case BOOSTING:
                 logger.info("Autopilot is [{}] the StreamThread count.", BOOSTING);
-                yield doAddStreamThread()
+                return doAddStreamThread()
                         .thenApply(thread -> state);
-            }
-            case DECREASING -> {
+            case DECREASING:
                 logger.info("Autopilot is [{}] the StreamThread count.", DECREASING);
-                yield doRemoveStreamThread()
+                return doRemoveStreamThread()
                         .thenApply(thread -> state);
-            }
-        };
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 
     private State decideNextState() {
@@ -271,7 +271,7 @@ public class DefaultAutopilot implements Autopilot {
     @Override
     public CompletableFuture<String> addStreamThread(final Duration timeout) {
         if (!state.isValidTransition(BOOSTING)) {
-            final String message = "Autopilot [NOOP]. Cannot manually transition from [%s] to [%s].".formatted(
+            final String message = String.format("Autopilot [NOOP]. Cannot manually transition from [%s] to [%s].",
                     state,
                     BOOSTING
             );
@@ -331,7 +331,7 @@ public class DefaultAutopilot implements Autopilot {
     @Override
     public CompletableFuture<String> removeStreamThread(final Duration timeout) {
         if (!state.isValidTransition(DECREASING)) {
-            final String message = "Autopilot [NOOP]. Cannot manually transition from [%s] to [%s].".formatted(
+            final String message = String.format("Autopilot [NOOP]. Cannot manually transition from [%s] to [%s].",
                     state,
                     DECREASING
             );

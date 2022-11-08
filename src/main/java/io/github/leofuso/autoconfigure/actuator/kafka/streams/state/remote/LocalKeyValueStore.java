@@ -39,14 +39,14 @@ public class LocalKeyValueStore implements RemoteKeyValueStateStore {
     public LocalKeyValueStore(final KStreamsSupplier supplier) {
         this.kStreamsSupplier = Objects.requireNonNull(supplier, "KStreamsSupplier [supplier] is required.");
         this.self = Optional.of(this.kStreamsSupplier)
-                            .map(KStreamsSupplier::configAsProperties)
-                            .map(StreamsConfig::new)
-                            .map(config -> config.getString(StreamsConfig.APPLICATION_SERVER_CONFIG))
-                            .map(HostInfo::buildFromEndpoint)
-                            .orElseThrow(() -> {
-                                final String message = "A required config is missing [application.server].";
-                                return new IllegalStateException(message);
-                            });
+                .map(KStreamsSupplier::configAsProperties)
+                .map(StreamsConfig::new)
+                .map(config -> config.getString(StreamsConfig.APPLICATION_SERVER_CONFIG))
+                .map(HostInfo::buildFromEndpoint)
+                .orElseThrow(() -> {
+                    final String message = "A required config is missing [application.server].";
+                    return new IllegalStateException(message);
+                });
     }
 
     public HostInfo self() {
@@ -88,9 +88,11 @@ public class LocalKeyValueStore implements RemoteKeyValueStateStore {
         if (this == other) {
             return true;
         }
-        if (!(other instanceof LocalKeyValueStore that)) {
+        if (!(other instanceof LocalKeyValueStore)) {
             return false;
+        } else {
+            LocalKeyValueStore that = (LocalKeyValueStore) other;
+            return reference().equals(that.reference());
         }
-        return reference().equals(that.reference());
     }
 }

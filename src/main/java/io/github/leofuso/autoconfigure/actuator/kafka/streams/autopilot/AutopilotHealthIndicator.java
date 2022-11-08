@@ -6,6 +6,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
+import java.util.stream.Collectors;
 
 import org.apache.kafka.common.TopicPartition;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
@@ -25,9 +26,8 @@ public class AutopilotHealthIndicator extends AbstractHealthIndicator {
     /**
      * Helper to format huge numbers, commonly placed in situations of high partition-lag.
      */
-    private static final NumberFormat numberFormat = NumberFormat.getCompactNumberInstance(
-            Locale.US,
-            NumberFormat.Style.SHORT
+    private static final NumberFormat numberFormat = NumberFormat.getNumberInstance(
+            Locale.US
     );
 
     /**
@@ -66,7 +66,7 @@ public class AutopilotHealthIndicator extends AbstractHealthIndicator {
                                final Map<TopicPartition, Long> value = entry.getValue();
                                return getDetails().apply(key, value);
                            })
-                           .toList();
+                           .collect(Collectors.toList());
 
             builder.withDetail("thread.info", threads);
             final Status status = support
@@ -95,13 +95,13 @@ public class AutopilotHealthIndicator extends AbstractHealthIndicator {
 
                                   @SuppressWarnings("UnnecessaryLocalVariable")
                                   final Map<String, Object> entries = Map.ofEntries(
-                                          Map.entry("partition", "%s".formatted(key)),
+                                          Map.entry("partition", String.format("%s",key)),
                                           Map.entry("lag", numberFormat.format(lag))
                                   );
 
                                   return entries;
                               })
-                              .toList();
+                              .collect(Collectors.toList());
 
             return Map.ofEntries(
                     Map.entry("name", thread),

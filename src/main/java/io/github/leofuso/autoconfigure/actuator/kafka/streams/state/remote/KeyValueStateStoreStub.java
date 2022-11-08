@@ -133,7 +133,8 @@ public class KeyValueStateStoreStub implements RemoteKeyValueStateStore, RemoteS
         if (!initialized) {
             throw new IllegalStateException("You can't invoke a shutdown before the stub initialization.");
         }
-        if (stub != null && stub.getChannel() instanceof ManagedChannel channel) {
+        if (stub != null && stub.getChannel() instanceof ManagedChannel) {
+            ManagedChannel channel = (ManagedChannel) stub.getChannel();
             channel.shutdown();
         }
     }

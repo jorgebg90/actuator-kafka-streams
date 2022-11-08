@@ -46,7 +46,7 @@ public class DefaultHostManager implements HostManager {
     public DefaultHostManager(KStreamsSupplier supplier, Stream<RemoteStateStore> supported, Stream<GrpcChannelConfigurer> configuration) {
         this.kStreamsSupplier = Objects.requireNonNull(supplier, "KStreamsSupplier [supplier] is required.");
         this.supported = supported.collect(Collectors.toSet());
-        this.configuration = configuration.toList();
+        this.configuration = configuration.collect(Collectors.toList());
         this.stores = new ConcurrentHashMap<>();
     }
 
@@ -99,7 +99,8 @@ public class DefaultHostManager implements HostManager {
 
             final R remote = supported.stub(host);
             final String ref = remote.reference();
-            if (remote instanceof RemoteStateStoreStub stub) {
+            if (remote instanceof RemoteStateStoreStub) {
+                RemoteStateStoreStub stub = (RemoteStateStoreStub) remote;
                 configuration.forEach(config -> stub.configure(config::configure));
                 logger.info("Initializing a new host[{}:{}] with ref[{}]", host.host(), host.port(), ref);
                 stub.initialize();
@@ -118,7 +119,8 @@ public class DefaultHostManager implements HostManager {
         logger.info("Starting HostManager clean-up, gRPC services may be temporally unavailable.");
         for (Map.Entry<HostInfo, RemoteStateStore> entry : stores.entrySet()) {
             final RemoteStateStore store = entry.getValue();
-            if (store instanceof RemoteStateStoreStub stub) {
+            if (store instanceof RemoteStateStoreStub) {
+                RemoteStateStoreStub stub = (RemoteStateStoreStub) store;
                 stub.shutdown();
             }
             final HostInfo host = entry.getKey();

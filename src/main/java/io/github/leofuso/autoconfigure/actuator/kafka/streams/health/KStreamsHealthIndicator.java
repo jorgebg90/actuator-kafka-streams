@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Properties;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.streams.KafkaStreams;
@@ -55,9 +56,8 @@ public class KStreamsHealthIndicator extends AbstractHealthIndicator {
     /**
      * Helper to format huge numbers, commonly placed in situations of high partition-lag.
      */
-    private static final NumberFormat numberFormat = NumberFormat.getCompactNumberInstance(
-            Locale.US,
-            NumberFormat.Style.SHORT
+    private static final NumberFormat numberFormat = NumberFormat.getNumberInstance(
+            Locale.US
     );
 
     /**
@@ -152,18 +152,18 @@ public class KStreamsHealthIndicator extends AbstractHealthIndicator {
                         "active.tasks", taskDetails(metadata.activeTasks()),
                         "standby.tasks", taskDetails(metadata.standbyTasks())
                 ))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     private List<Map<String, Object>> taskDetails(Set<TaskMetadata> taskMetadata) {
         final String taskIdKey = "task.id";
         return taskMetadata.stream()
                            .map(metadata -> Map.of(
-                                   taskIdKey, "%s".formatted(metadata.taskId()),
+                                   taskIdKey, String.format("%s",metadata.taskId()),
                                    "partitions", addPartitionsInfo(metadata)
                            ))
                            .sorted(Comparator.comparing(map -> (String) map.get(taskIdKey)))
-                           .toList();
+                           .collect(Collectors.toList());
     }
 
     private List<Map<String, Object>> addPartitionsInfo(TaskMetadata metadata) {
@@ -181,7 +181,7 @@ public class KStreamsHealthIndicator extends AbstractHealthIndicator {
 
                     @SuppressWarnings("UnnecessaryLocalVariable")
                     final Map<String, Object> entries = Map.ofEntries(
-                            Map.entry("partition", "%s".formatted(tp)),
+                            Map.entry("partition", String.format("%s",tp)),
                             Map.entry("committed.offset", committedOffset),
                             Map.entry("end.offset", endOffset),
                             Map.entry("lag", numberFormat.format(lag))
@@ -190,7 +190,7 @@ public class KStreamsHealthIndicator extends AbstractHealthIndicator {
                     return entries;
                 })
                 .sorted(Comparator.comparing(map -> (String) map.get("partition")))
-                .toList();
+                .collect(Collectors.toList());
     }
 
     private boolean hasMinimumThreadCount(KafkaStreams kafkaStreams) {

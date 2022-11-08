@@ -92,15 +92,7 @@ public class ReadOnlyStateStoreEndpointTest {
     }
 
     @Test
-    @DisplayName(
-    """
-                    
-                     Given a local state, with default key-serde;
-                     When queried;
-                     should return correct value
-                    
-    """
-    )
+    @DisplayName("Given a local state, with default key-serde when queried should return correct value")
     void t3() throws JsonProcessingException {
         /* Given */
 
@@ -132,15 +124,7 @@ public class ReadOnlyStateStoreEndpointTest {
     }
 
     @Test
-    @DisplayName(
-    """
-                    
-                     Given a remote and local state, with default key-serde;
-                     When queried;
-                     Then should return correct value
-                    
-    """
-    )
+    @DisplayName(" Given a remote and local state, with default key-serde when queried then should return correct value")
     void t4() throws JsonProcessingException {
         /* Given */
 
@@ -198,15 +182,7 @@ public class ReadOnlyStateStoreEndpointTest {
     }
 
     @Test
-    @DisplayName(
-    """
-    
-                     Given a local state, with supported key-serde;
-                     When queried;
-                     Then should return correct value
-    
-    """
-    )
+    @DisplayName("Given a local state, with supported key-serde when queried then should return correct value")
     void t5() throws JsonProcessingException {
         /* Given */
 
@@ -240,14 +216,7 @@ public class ReadOnlyStateStoreEndpointTest {
     }
 
     @Test
-    @DisplayName(
-    """
-    
-                     Given a local state, with unsupported mapping;
-                     When queried;
-                     Then should return conversion error
-    
-    """
+    @DisplayName("Given a local state, with supported key-serde when queried then should return correct value"
     )
     void t6() {
         /* Given */
